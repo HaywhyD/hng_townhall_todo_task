@@ -6,13 +6,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:text_area/text_area.dart';
 import 'package:to_do_app/common/constants/app_color.dart';
+import 'package:to_do_app/data/models/todo_model.dart';
+import 'package:to_do_app/data/shared_preferences/shared_preferences.dart';
 
 import '../../common/components/custom_text.dart';
 import '../../common/components/dimension.dart';
 import '../../common/constants/route_constant.dart';
 import '../../core/config/router_config.dart';
 import '../../core/providers/todo_provider.dart';
-import '../../data/shared_preferences/shared_preferences.dart';
 
 class AddTodoScreen extends StatefulWidget {
   const AddTodoScreen({super.key});
@@ -22,21 +23,26 @@ class AddTodoScreen extends StatefulWidget {
 }
 
 class _AddTodoScreenState extends State<AddTodoScreen> {
-  List<Map<String, dynamic>> categories = [];
   final additionalDetailController = TextEditingController();
   bool reasonValidation = true;
   final GlobalKey<FormState> addDetailsKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> todoFormKey = GlobalKey<FormState>();
   final TextEditingController todoController = TextEditingController();
   final TextEditingController subTaskController = TextEditingController();
   final TextEditingController detailsController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
-
+  final TodoModel _todoModel = TodoModel();
+  String category = '';
+  List<bool> isChecked = [];
+  List<String> subTasks = [];
   @override
   void initState() {
     super.initState();
-    categories = SharedPreferencesManager.loadCategories();
-    print(categories);
+    setState(() {
+      isChecked = List.generate(
+          context.read<TodoNotifier>().categories.length, (index) => false);
+    });
   }
 
   @override
@@ -61,8 +67,8 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                     GestureDetector(
                         onTap: () => routerConfig.pop(),
                         child: const Icon(CupertinoIcons.xmark)),
-                    const Align(
-                      alignment: Alignment(0, 0.5),
+                    Align(
+                      alignment: const Alignment(0, 0.5),
                       child: CustomText(
                         requiredText: 'Add To-do',
                         fontSize: MyDimension.dim16,
@@ -73,31 +79,41 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                   ],
                 ),
                 40.verticalSpace,
-                const CustomText(
+                CustomText(
                   requiredText: 'To-do',
                   fontSize: MyDimension.dim12,
                   fontWeight: FontWeight.bold,
                 ),
                 10.verticalSpace,
-                TextField(
-                  controller: todoController,
-                  onChanged: (value) {},
-                  decoration: InputDecoration(
-                    hintText: 'What do you want to do',
-                    hintStyle: GoogleFonts.roboto(
-                      color: const Color(0xFFDEE1E4),
-                      fontSize: MyDimension.dim22,
-                      fontWeight: FontWeight.bold,
+                Form(
+                  key: todoFormKey,
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Required Field';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: todoController,
+                    onChanged: (value) {},
+                    decoration: InputDecoration(
+                      hintText: 'What do you want to do',
+                      hintStyle: GoogleFonts.roboto(
+                        color: const Color(0xFFDEE1E4),
+                        fontSize: MyDimension.dim22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: const BorderSide(
+                            width: 1, color: AppColor.appColor),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 1),
                     ),
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide:
-                          const BorderSide(width: 1, color: AppColor.appColor),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 1),
                   ),
                 ),
                 20.verticalSpace,
@@ -199,7 +215,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                                           todoNotifier.setShowTaskField(false);
                                         }
                                       },
-                                      child: const CustomText(
+                                      child: CustomText(
                                         requiredText: 'Remove',
                                         color: Colors.red,
                                         fontSize: MyDimension.dim12,
@@ -225,7 +241,6 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                         child: TextField(
                           controller: subTaskController,
                           onChanged: (value) {
-                            subTaskController.text = value;
                             if (subTaskController.text.isNotEmpty) {
                               todoNotifier.setIsTypingSubTask(true);
                             } else {
@@ -299,10 +314,10 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                             context.read<TodoNotifier>().setShowTaskField(true);
                           }
                         },
-                        child: const CustomText(
+                        child: CustomText(
                           requiredText: 'New sub-task',
                           fontSize: MyDimension.dim12,
-                          color: Color(0xFF10CFB1),
+                          color: const Color(0xFF10CFB1),
                         ))
                   ],
                 ),
@@ -310,112 +325,131 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                 const CustomText(requiredText: 'Category'),
                 5.verticalSpace,
                 SizedBox(
-                  height: 67,
+                  height: 50.h,
                   width: mediaQuery.width,
-                  child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: categories.length,
-                      shrinkWrap: true,
-                      itemBuilder: (BuildContext context, int index) {
-                        bool isAddCategory = index == 3;
-
-                        bool selectedIndex =
-                            todoNotifier.selectedCategoryIndex == index;
-                        return Row(
-                          children: [
-                            GestureDetector(
-                                child: !isAddCategory
-                                    ? GestureDetector(
-                                        onTap: () => context
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount:
+                                context.watch<TodoNotifier>().categories.length,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              return Row(
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        isChecked = List.generate(
+                                            context
+                                                .read<TodoNotifier>()
+                                                .categories
+                                                .length,
+                                            (index) => false);
+                                        isChecked[index] = !isChecked[index];
+                                        context
                                             .read<TodoNotifier>()
-                                            .setSelectedCategoryIndex(index),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 15, vertical: 5),
-                                          height: 50,
-                                          decoration: ShapeDecoration(
-                                            color: selectedIndex
-                                                ? const Color(0xFF10CFB1)
-                                                : const Color(0xFF92A19F),
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12)),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              if (selectedIndex)
-                                                const Icon(
-                                                  Icons.done,
-                                                  color: Colors.white,
-                                                  size: 20,
-                                                ),
-                                              if (selectedIndex)
-                                                5.horizontalSpace,
-                                              //category
-                                              Flexible(
-                                                fit: FlexFit.loose,
-                                                child: CustomText(
-                                                  requiredText:
-                                                      categories[index]['text'],
-                                                  fontSize: MyDimension.dim14,
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w500,
-                                                  softWrap: true,
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                    : Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 5),
-                                        constraints: const BoxConstraints(
-                                          minWidth: 140,
-                                          maxWidth: 140,
-                                          minHeight: 50,
-                                          maxHeight: 50,
-                                        ),
-                                        decoration: ShapeDecoration(
-                                          color: const Color(0xFFEDEDED),
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                        ),
-                                        child: const Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              CupertinoIcons.plus,
-                                              color: AppColor.textColor,
+                                            .setSelectedCategoryIndex(index);
+                                        category = context
+                                            .read<TodoNotifier>()
+                                            .categories[index]['text'];
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 10),
+                                      decoration: ShapeDecoration(
+                                        color: isChecked[index]
+                                            ? const Color(0xFF10CFB1)
+                                            : Colors.grey,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8)),
+                                      ),
+                                      constraints: BoxConstraints(
+                                        minWidth: 120.w,
+                                        maxWidth: 120.w,
+                                        minHeight: 50.h,
+                                        maxHeight: 50.h,
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Visibility(
+                                            visible: isChecked[index],
+                                            child: const Icon(
+                                              Icons.check,
+                                              color: Colors.white,
                                             ),
-                                            Flexible(
-                                              child: CustomText(
-                                                requiredText: 'Add Category',
-                                                fontSize: MyDimension.dim12,
-                                                color: Color(0xFF192028),
-                                                fontWeight: FontWeight.w500,
-                                                softWrap: true,
-                                                textAlign: TextAlign.center,
-                                              ),
+                                          ),
+                                          Expanded(
+                                            child: CustomText(
+                                              requiredText: context
+                                                  .read<TodoNotifier>()
+                                                  .categories[index]['text'],
+                                              fontSize: MyDimension.dim12,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                              softWrap: true,
+                                              textAlign: TextAlign.center,
                                             ),
-                                          ],
-                                        ),
-                                      )),
-                            20.horizontalSpace,
-                          ],
-                        );
-                      }),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  20.horizontalSpace,
+                                ],
+                              );
+                            }),
+                        Container(
+                          height: 67.h,
+                          width: mediaQuery.width,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
+                          constraints: BoxConstraints(
+                            minWidth: 140.w,
+                            maxWidth: 140.w,
+                            minHeight: 67.h,
+                            maxHeight: 67.h,
+                          ),
+                          decoration: ShapeDecoration(
+                            color: Colors.grey.shade200,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                CupertinoIcons.plus,
+                                color: AppColor.textColor,
+                              ),
+                              Flexible(
+                                child: CustomText(
+                                  requiredText: 'Add Categories',
+                                  fontSize: MyDimension.dim12,
+                                  color: const Color(0xFF192028),
+                                  fontWeight: FontWeight.w500,
+                                  softWrap: true,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 20.verticalSpace,
                 const CustomText(requiredText: 'Additional detail'),
@@ -431,12 +465,34 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                   ),
                 ),
                 40.verticalSpace,
-                GestureDetector(
-                  onTap: () {
-                    if (todoController.text.isNotEmpty &&
+                InkWell(
+                  onTap: () async {
+                    if (todoFormKey.currentState!.validate() &&
+                        todoController.text.isNotEmpty &&
                         dateController.text.isNotEmpty &&
                         timeController.text.isNotEmpty &&
-                        todoNotifier.selectedCategoryIndex >= 0) {
+                        category.isNotEmpty) {
+                      _todoModel.todoType = 'upcoming';
+                      _todoModel.todoCategory = category;
+                      _todoModel.todoDate = dateController.text;
+                      _todoModel.todoTime = timeController.text;
+                      _todoModel.todoIsCompleted = false;
+                      _todoModel.todoIsDue = false;
+                      _todoModel.todoSubTask = subTasks;
+                      _todoModel.todoAddDetails =
+                          additionalDetailController.text;
+                      _todoModel.todoName = todoController.text;
+                      _todoModel.todoFullDate = DateTime.now().toString();
+
+                      final todos = SharedPreferencesManager.loadTodos();
+
+                      setState(() {
+                        todos.add(_todoModel.toJson());
+                      });
+
+                      await SharedPreferencesManager.saveTodos(todos);
+                      addTodos(todos);
+
                       routerConfig.pushReplacement(RoutesPath.successScreen);
                     }
                   },
@@ -447,7 +503,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                         color: todoController.text.isNotEmpty &&
                                 dateController.text.isNotEmpty &&
                                 timeController.text.isNotEmpty &&
-                                todoNotifier.selectedCategoryIndex >= 0
+                                category.isNotEmpty
                             ? AppColor.appColor
                             : const Color(0xFFB6AFA8),
                         shape: RoundedRectangleBorder(
@@ -461,7 +517,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                           size: 20,
                         ),
                         10.horizontalSpace,
-                        const CustomText(
+                        CustomText(
                           requiredText: 'Add To-do',
                           fontSize: MyDimension.dim16,
                           color: Colors.white,
@@ -475,5 +531,9 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
             ),
           ),
         ));
+  }
+
+  addTodos(List<Map<String, dynamic>> todos) {
+    context.read<TodoNotifier>().addTodo(todos);
   }
 }

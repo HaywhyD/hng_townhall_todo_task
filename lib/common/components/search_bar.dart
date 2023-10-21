@@ -21,17 +21,22 @@ class CustomSearchBar extends StatelessWidget {
       onTap: onTap,
       shape: MaterialStateProperty.all(
         RoundedRectangleBorder(
-          side: const BorderSide(width: 1, color: Color(0xFFD1CDCD)),
+          side: const BorderSide(
+            width: 1,
+            color: Color(0xFFD1CDCD),
+          ),
           borderRadius: BorderRadius.circular(8),
         ),
       ),
       backgroundColor:
           MaterialStateProperty.all(Colors.white), // Background color
       padding: MaterialStateProperty.all(const EdgeInsets.all(12.0)),
-      shadowColor: const MaterialStatePropertyAll(Colors.white),
-      hintStyle: MaterialStateProperty.all(GoogleFonts.roboto(
+      hintStyle: MaterialStateProperty.all(
+        GoogleFonts.roboto(
           color: AppColor.textColor.withOpacity(0.5),
-          fontSize: MyDimension.dim10)),
+          fontSize: MyDimension.dim10,
+        ),
+      ),
       hintText: "Search for task, date, categories",
       leading: Image.asset(
         'assets/png/search.png',

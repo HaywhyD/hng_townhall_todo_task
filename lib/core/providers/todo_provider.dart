@@ -9,7 +9,8 @@ class TodoNotifier with ChangeNotifier {
   final String _greetingText = 'Hi, Samuel I.';
   String get greetingText => _greetingText;
   int _navIndex = 0;
-  int selectedCategoryIndex = -1;
+  int _selectedCategoryIndex = -1;
+  int get selectedCategoryIndex => _selectedCategoryIndex;
 
   TextEditingController searchController = TextEditingController();
   bool _isListVisible = true;
@@ -92,7 +93,10 @@ class TodoNotifier with ChangeNotifier {
   }
 
   void toggleItemCheckState(int index) {
-    todoList[index]['checked'] = !todoList[index]['checked'];
+    todoList[index]['todoIsCompleted'] = !todoList[index]['todoIsCompleted'];
+    todoList[index]['todoIsCompleted']
+        ? todoList[index]['todoType'] = 'done'
+        : todoList[index]['todoType'] = 'upcoming';
     SharedPreferencesManager.saveTodos(todoList);
     notifyListeners();
   }
@@ -128,7 +132,7 @@ class TodoNotifier with ChangeNotifier {
   }
 
   void setSelectedCategoryIndex(int index) {
-    selectedCategoryIndex = index;
+    _selectedCategoryIndex = index;
     notifyListeners();
   }
 }

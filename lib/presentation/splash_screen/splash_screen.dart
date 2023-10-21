@@ -55,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen>
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const CustomText(
+                CustomText(
                   requiredText: 'To-Do List',
                   color: AppColor.appColor,
                   fontSize: MyDimension.dim35,
