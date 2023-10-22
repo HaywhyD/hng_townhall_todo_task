@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesManager {
@@ -11,9 +10,10 @@ class SharedPreferencesManager {
 
   static SharedPreferences get prefs => _prefs;
 
-  static Future<void> saveTodos(List<Map<String, dynamic>> todos) async {
+  static Future<void> saveTodos(
+      List<Map<String, dynamic>> todos, String type) async {
     final jsonString = jsonEncode(todos);
-    await _prefs.setString('todos', jsonString);
+    await _prefs.setString(type, jsonString);
   }
 
   static Future<void> saveCategories(
@@ -26,12 +26,12 @@ class SharedPreferencesManager {
     await _prefs.remove('categories');
   }
 
-  static Future<void> clearTodos() async {
-    await _prefs.remove('todos');
+  static Future<void> clearTodos(String todoType) async {
+    await _prefs.remove(todoType);
   }
 
-  static List<Map<String, dynamic>> loadTodos() {
-    final jsonString = _prefs.getString('todos');
+  static List<Map<String, dynamic>> loadTodos(String type) {
+    final jsonString = _prefs.getString(type);
     if (jsonString != null) {
       return List<Map<String, dynamic>>.from(jsonDecode(jsonString)
           .map((item) => Map<String, dynamic>.from(item)));

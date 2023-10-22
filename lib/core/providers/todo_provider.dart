@@ -29,6 +29,10 @@ class TodoNotifier with ChangeNotifier {
 
   int get navIndex => _navIndex;
   List<Map<String, dynamic>> _todoList = [];
+  List<Map<String, dynamic>> _doneTodoList = [];
+  List<Map<String, dynamic>> _overdueTodoList = [];
+  List<Map<String, dynamic>> get doneTodoList => _doneTodoList;
+  List<Map<String, dynamic>> get overdueTodoList => _overdueTodoList;
   List<Map<String, dynamic>> get todoList => _todoList;
   List<Map<String, dynamic>> _categories = [];
   List<Map<String, dynamic>> get categories => _categories;
@@ -48,8 +52,9 @@ class TodoNotifier with ChangeNotifier {
     notifyListeners();
   }
 
-  void hideTodoList(bool hideTodoIfEMpty) {
-    _isListVisible = hideTodoIfEMpty;
+  void hideTodoList(bool hideTodoIfEmpty) {
+    _isListVisible = hideTodoIfEmpty;
+
     notifyListeners();
   }
 
@@ -60,6 +65,16 @@ class TodoNotifier with ChangeNotifier {
 
   void addTodo(List<Map<String, dynamic>> todo) {
     _todoList = todo;
+    notifyListeners();
+  }
+
+  void addOverDueTodo(List<Map<String, dynamic>> todo) {
+    _overdueTodoList = todo;
+    notifyListeners();
+  }
+
+  void addDoneTodo(List<Map<String, dynamic>> todo) {
+    _doneTodoList = todo;
     notifyListeners();
   }
 
@@ -92,32 +107,69 @@ class TodoNotifier with ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleItemCheckState(int index) {
-    todoList[index]['todoIsCompleted'] = !todoList[index]['todoIsCompleted'];
-    todoList[index]['todoIsCompleted']
-        ? todoList[index]['todoType'] = 'done'
-        : todoList[index]['todoType'] = 'upcoming';
-    SharedPreferencesManager.saveTodos(todoList);
+  void toggleTodoItemCheckState(int index) async {
+    _todoList[index]['todoIsCompleted'] = !_todoList[index]['todoIsCompleted'];
+    notifyListeners();
+  }
+
+  void toggleOverdueTodoItemCheckState(int index) async {
+    _overdueTodoList[index]['todoIsCompleted'] =
+        !_overdueTodoList[index]['todoIsCompleted'];
+    notifyListeners();
+  }
+
+  void toggleDoneTodoItemCheckState(int index) async {
+    _doneTodoList[index]['todoIsCompleted'] =
+        !_doneTodoList[index]['todoIsCompleted'];
+    notifyListeners();
+  }
+
+  void removeDoneFromTodo(int index) async {
+    if (_todoList[index]['todoIsCompleted']) {
+      _todoList[index]['todoType'] = 'done';
+      _doneTodoList.add(todoList[index]);
+      await SharedPreferencesManager.saveTodos(_doneTodoList, 'done');
+      _todoList.removeAt(index);
+      await SharedPreferencesManager.saveTodos(_todoList, 'todos');
+    }
+    notifyListeners();
+  }
+
+  void removeDoneFromOverdueTodo(int index) async {
+    if (_overdueTodoList[index]['todoIsCompleted']) {
+      _overdueTodoList[index]['todoType'] = 'done';
+      _doneTodoList.add(_overdueTodoList[index]);
+      await SharedPreferencesManager.saveTodos(_doneTodoList, 'done');
+      _overdueTodoList.removeAt(index);
+      await SharedPreferencesManager.saveTodos(_overdueTodoList, 'todos');
+    }
     notifyListeners();
   }
 
   void toggleFloatButton() {
     _isFloatingPressed = !_isFloatingPressed;
+
     notifyListeners();
   }
 
   void toggleListVisibility() {
     _isListVisible = !_isListVisible;
+    _isOverdue = false;
+    _isNotes = false;
     notifyListeners();
   }
 
   void toggleOverdueVisibility() {
     _isOverdue = !_isOverdue;
+    _isNotes = !_isNotes;
+    _isListVisible = false;
     notifyListeners();
   }
 
   void toggleNotesVisibility() {
     _isNotes = !_isNotes;
+    _isListVisible = false;
+    _isOverdue = false;
     notifyListeners();
   }
 

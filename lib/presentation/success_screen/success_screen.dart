@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:to_do_app/common/constants/assets_constants.dart';
 
 import '../../common/components/custom_text.dart';
 import '../../common/constants/route_constant.dart';
@@ -40,10 +42,10 @@ class _SuccessScreenState extends State<SuccessScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(
-                  width: 144,
-                  height: 144,
-                  child: Stack(children: []),
+                SizedBox(
+                  width: 144.w,
+                  height: 144.h,
+                  child: SvgPicture.asset('${Assets.svgPath}/done.svg'),
                 ),
                 24.verticalSpace,
                 const Column(

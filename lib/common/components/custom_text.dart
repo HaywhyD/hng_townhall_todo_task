@@ -21,7 +21,8 @@ class CustomText extends StatelessWidget {
     this.textDecoration,
     this.softWrap = true,
     this.maxLines,
-    this.textAlign, this.overflow,
+    this.textAlign,
+    this.overflow,
   }) : super(key: key);
 
   @override

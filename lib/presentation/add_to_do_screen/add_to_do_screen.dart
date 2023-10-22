@@ -208,7 +208,6 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                                     GestureDetector(
                                       onTap: () {
                                         todoNotifier.removeSubTask(item);
-                                        print(todoNotifier.tempSubTask.length);
                                         if (todoNotifier.tempSubTask.isEmpty) {
                                           todoNotifier
                                               .setIsOneTempSubTask(false);
@@ -484,15 +483,13 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                       _todoModel.todoName = todoController.text;
                       _todoModel.todoFullDate = DateTime.now().toString();
 
-                      final todos = SharedPreferencesManager.loadTodos();
+                      final todos = SharedPreferencesManager.loadTodos('todos');
 
                       setState(() {
                         todos.add(_todoModel.toJson());
                       });
 
-                      await SharedPreferencesManager.saveTodos(todos);
-                      addTodos(todos);
-
+                      await SharedPreferencesManager.saveTodos(todos, 'todos');
                       routerConfig.pushReplacement(RoutesPath.successScreen);
                     }
                   },
