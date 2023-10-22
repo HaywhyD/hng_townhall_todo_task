@@ -169,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            40.verticalSpace,
+                            50.verticalSpace,
                             //user header
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -385,16 +385,45 @@ class _HomeScreenState extends State<HomeScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      'Upcoming To-do\'s',
-                                      style: GoogleFonts.roboto(
-                                        color: const Color(0xFF192028),
-                                        fontSize: MyDimension.dim16,
-                                        fontWeight: FontWeight.w500,
-                                        height: 0,
-                                      ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Upcoming To-do\'s',
+                                          style: GoogleFonts.roboto(
+                                            color: const Color(0xFF192028),
+                                            fontSize: MyDimension.dim16,
+                                            fontWeight: FontWeight.w500,
+                                            height: 0,
+                                          ),
+                                        ),
+                                        10.horizontalSpace,
+                                        Container(
+                                          width: 25.w,
+                                          height: 25.h,
+                                          alignment: Alignment.center,
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 2),
+                                          decoration: ShapeDecoration(
+                                            color: const Color(0xFFFF4C4C),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
+                                          ),
+                                          child: Text(
+                                            "${watch.todoList.length}",
+                                            style: GoogleFonts.roboto(
+                                              color: Colors.white,
+                                              fontSize: MyDimension.dim10,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    10.horizontalSpace,
                                     //down arrow
                                     SizedBox(
                                       width: 16.w,
@@ -607,7 +636,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           ),
                                         ),
-                                        20.verticalSpace
                                       ],
                                     ),
                                     10.horizontalSpace,
@@ -956,6 +984,7 @@ class _HomeScreenState extends State<HomeScreen> {
             : AppColor.appColor,
         child: Icon(
           todoNotifier.isFloatingPressed ? CupertinoIcons.xmark : Icons.add,
+          color: Colors.white,
         ), // Customize the button color.
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

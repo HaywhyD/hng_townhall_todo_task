@@ -47,77 +47,90 @@ class _DoneToDoScreenState extends State<DoneToDoScreen> {
               ),
             ),
             25.horizontalSpace,
-            Expanded(
-              child: ListView.builder(
-                itemCount: _categorizedTodos.length,
-                itemBuilder: (context, index) {
-                  final categories = _categorizedTodos.keys.toList();
-                  final category = categories[index];
-                  final todos = _categorizedTodos[category]!;
+            Visibility(
+              visible: _categorizedTodos.isNotEmpty,
+              child: Expanded(
+                child: ListView.builder(
+                  itemCount: _categorizedTodos.length,
+                  itemBuilder: (context, index) {
+                    final categories = _categorizedTodos.keys.toList();
+                    final category = categories[index];
+                    final todos = _categorizedTodos[category]!;
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          Text(category),
-                        ],
-                      ), // Display the category (e.g., 'Today', 'Yesterday', or date)
-
-                      SizedBox(
-                        height: 5.h,
-                      ),
-                      for (final todo in todos)
-                        Column(
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SizedBox(
-                                  height: 30.h,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Image.asset(
-                                        'assets/png/checked.png',
-                                        width: 25,
-                                      ),
-                                      10.horizontalSpace,
-                                      SizedBox(
-                                        width: 180.w,
-                                        child: CustomText(
-                                          color: Colors.grey.shade600,
-                                          requiredText: todo.name,
-                                          overflow: TextOverflow.ellipsis,
-                                          softWrap: true,
-                                          textDecoration:
-                                              TextDecoration.lineThrough,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                10.horizontalSpace,
-                                const Icon(
-                                  CupertinoIcons.right_chevron,
-                                  size: 15,
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 5.h,
-                            ),
+                            Text(category),
                           ],
+                        ), // Display the category (e.g., 'Today', 'Yesterday', or date)
+
+                        SizedBox(
+                          height: 5.h,
                         ),
-                      const Divider(
-                        color: Color(0xFFEBEAEA),
-                        thickness: 1.5,
-                      )
-                    ],
-                  );
-                },
+                        for (final todo in todos)
+                          Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    height: 30.h,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Image.asset(
+                                          'assets/png/checked.png',
+                                          width: 25,
+                                        ),
+                                        10.horizontalSpace,
+                                        SizedBox(
+                                          width: 180.w,
+                                          child: CustomText(
+                                            color: Colors.grey.shade600,
+                                            requiredText: todo.name,
+                                            overflow: TextOverflow.ellipsis,
+                                            softWrap: true,
+                                            textDecoration:
+                                                TextDecoration.lineThrough,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  10.horizontalSpace,
+                                  const Icon(
+                                    CupertinoIcons.right_chevron,
+                                    size: 15,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 5.h,
+                              ),
+                            ],
+                          ),
+                        const Divider(
+                          color: Color(0xFFEBEAEA),
+                          thickness: 1.5,
+                        )
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
+            Center(
+                child: Visibility(
+              visible: _categorizedTodos.isEmpty,
+              child: const CustomText(
+                requiredText: 'No to-do yet',
+                color: Colors.black,
+              ),
+            )),
             40.verticalSpace,
           ],
         ),

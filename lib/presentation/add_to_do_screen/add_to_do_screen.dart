@@ -101,7 +101,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                     decoration: InputDecoration(
                       hintText: 'What do you want to do',
                       hintStyle: GoogleFonts.roboto(
-                        color: const Color(0xFFDEE1E4),
+                        color: Colors.grey.shade400,
                         fontSize: MyDimension.dim22,
                         fontWeight: FontWeight.bold,
                       ),
