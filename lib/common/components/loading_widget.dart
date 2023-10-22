@@ -12,7 +12,7 @@ class LoadingWidget extends StatefulWidget {
 class _LoadingWidgetState extends State<LoadingWidget> {
   @override
   Widget build(BuildContext context) {
-    return LoadingAnimationWidget.stretchedDots(
+    return LoadingAnimationWidget.dotsTriangle(
         color: AppColor.appColor, size: 50);
   }
 }

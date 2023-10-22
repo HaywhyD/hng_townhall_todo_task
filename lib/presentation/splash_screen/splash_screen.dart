@@ -42,32 +42,17 @@ class _SplashScreenState extends State<SplashScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Positioned(
-                  top: 4.0,
-                  left: 0.0,
-                  child: CustomText(
-                    requiredText: 'To-Do List',
-                    color: AppColor.textColor.withOpacity(0.6),
-                    fontSize: MyDimension.dim35,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                CustomText(
-                  requiredText: 'To-Do List',
-                  color: AppColor.appColor,
-                  fontSize: MyDimension.dim35,
-                  fontWeight: FontWeight.bold,
-                ),
-              ],
+            CustomText(
+              requiredText: 'HNG Todo',
+              color: AppColor.textColor,
+              fontSize: MyDimension.dim35,
+              fontWeight: FontWeight.bold,
             ),
             10.verticalSpace,
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 55),
               child: CustomText(
-                requiredText: 'Let\'s do this',
+                requiredText: 'By Mavipop',
                 color: AppColor.appColor.withOpacity(0.7),
                 fontSize: MyDimension.dim22,
               ),

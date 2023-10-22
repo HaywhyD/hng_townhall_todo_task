@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:to_do_app/presentation/category_to_do_screen/category_todo_screen.dart';
 
 import '../../common/constants/route_constant.dart';
 import '../../presentation/add_to_do_screen/add_to_do_screen.dart';
@@ -18,6 +19,45 @@ final GoRouter routerConfig = GoRouter(
           key: state.pageKey,
         ),
       ),
+      GoRoute(
+          path: RoutesPath.categoryScreen,
+          pageBuilder: (context, state) {
+            if (state.extra != null) {
+              Map<String, dynamic> args = state.extra as Map<String, dynamic>;
+
+              return CustomTransitionPage(
+                  transitionDuration: const Duration(milliseconds: 500),
+                  barrierDismissible: false,
+                  key: state.pageKey,
+                  child: CategoryToDoScreen(
+                    category: args['category'],
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(
+                      opacity: CurveTween(curve: Curves.easeInOutCirc)
+                          .animate(animation),
+                      child: child,
+                    );
+                  });
+            } else {
+              return CustomTransitionPage(
+                  transitionDuration: const Duration(milliseconds: 500),
+                  barrierDismissible: false,
+                  key: state.pageKey,
+                  child: const CategoryToDoScreen(
+                    category: '',
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(
+                      opacity: CurveTween(curve: Curves.easeInOutCirc)
+                          .animate(animation),
+                      child: child,
+                    );
+                  });
+            }
+          }),
       GoRoute(
           path: RoutesPath.homeScreen,
           pageBuilder: (context, state) {

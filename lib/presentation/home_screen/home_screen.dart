@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do_app/common/constants/assets_constants.dart';
@@ -140,6 +141,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context).size;
     final todoNotifier = context.watch<TodoNotifier>();
+    final watch = context.watch<TodoNotifier>();
+    final read = context.read<TodoNotifier>();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F7F7),
@@ -233,67 +236,81 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     ListView.builder(
                                         scrollDirection: Axis.horizontal,
-                                        itemCount: context
-                                            .watch<TodoNotifier>()
-                                            .categories
-                                            .length,
+                                        itemCount: watch.categories.length,
                                         shrinkWrap: true,
                                         itemBuilder: (context, index) {
                                           return Row(
                                             children: [
-                                              GestureDetector(
+                                              InkWell(
+                                                  onTap: () => context.push(
+                                                        RoutesPath
+                                                            .categoryScreen,
+                                                        extra: {
+                                                          "category": context
+                                                                  .read<
+                                                                      TodoNotifier>()
+                                                                  .categories[
+                                                              index]['text'],
+                                                        },
+                                                      ),
                                                   child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
                                                         horizontal: 10,
                                                         vertical: 10),
-                                                decoration: ShapeDecoration(
-                                                  gradient: LinearGradient(
-                                                    begin: const Alignment(
-                                                        0.00, -1.00),
-                                                    end: const Alignment(0, 1),
-                                                    colors: gradient[index]
-                                                        ['gradient'],
-                                                  ),
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8)),
-                                                ),
-                                                constraints: BoxConstraints(
-                                                  minWidth: 120.w,
-                                                  maxWidth: 120.w,
-                                                  minHeight: 67.h,
-                                                  maxHeight: 67.h,
-                                                ),
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    Expanded(
-                                                      child: CustomText(
-                                                        requiredText: context
-                                                                .read<
-                                                                    TodoNotifier>()
-                                                                .categories[
-                                                            index]['text'],
-                                                        fontSize:
-                                                            MyDimension.dim12,
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        softWrap: true,
-                                                        textAlign:
-                                                            TextAlign.center,
+                                                    decoration: ShapeDecoration(
+                                                      gradient: LinearGradient(
+                                                        begin: const Alignment(
+                                                            0.00, -1.00),
+                                                        end: const Alignment(
+                                                            0, 1),
+                                                        colors: gradient[index]
+                                                            ['gradient'],
                                                       ),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8)),
                                                     ),
-                                                  ],
-                                                ),
-                                              )),
+                                                    constraints: BoxConstraints(
+                                                      minWidth: 120.w,
+                                                      maxWidth: 120.w,
+                                                      minHeight: 67.h,
+                                                      maxHeight: 67.h,
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Expanded(
+                                                          child: CustomText(
+                                                            requiredText: context
+                                                                    .read<
+                                                                        TodoNotifier>()
+                                                                    .categories[
+                                                                index]['text'],
+                                                            fontSize:
+                                                                MyDimension
+                                                                    .dim12,
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            softWrap: true,
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )),
                                               20.horizontalSpace,
                                             ],
                                           );
@@ -351,7 +368,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   .read<TodoNotifier>()
                                   .toggleListVisibility(),
                               child: Container(
-                                width: 343.w,
+                                width: double.infinity,
                                 height: 41.h,
                                 padding: EdgeInsets.symmetric(
                                   horizontal: 15.w,
@@ -395,145 +412,137 @@ class _HomeScreenState extends State<HomeScreen> {
                               AnimatedOpacity(
                                 opacity: todoNotifier.isListVisible ? 1.0 : 0.0,
                                 duration: const Duration(milliseconds: 800),
-                                child: SizedBox(
-                                  height: mediaQuery.height * 0.3,
-                                  width: mediaQuery.width,
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 300),
-                                    color: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20),
-                                    height: context
-                                            .watch<TodoNotifier>()
-                                            .isListVisible
-                                        ? MediaQuery.of(context).size.height
-                                        : 0,
-                                    child: context
-                                            .watch<TodoNotifier>()
-                                            .isListVisible
-                                        ? context
-                                                .watch<TodoNotifier>()
-                                                .todoList
-                                                .isNotEmpty
-                                            ? ListView.builder(
-                                                itemCount: context
-                                                    .watch<TodoNotifier>()
-                                                    .todoList
-                                                    .length,
-                                                itemBuilder: (context, index) {
-                                                  final item = context
-                                                      .read<TodoNotifier>()
-                                                      .todoList[index];
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  color: Colors.white,
+                                  padding: EdgeInsets.only(
+                                    left: 20.w,
+                                    right: 20.w,
+                                    bottom: 20.h,
+                                  ),
+                                  child: watch.isListVisible
+                                      ? context
+                                              .watch<TodoNotifier>()
+                                              .todoList
+                                              .isNotEmpty
+                                          ? ListView.builder(
+                                              shrinkWrap: true,
+                                              itemCount: context
+                                                  .watch<TodoNotifier>()
+                                                  .todoList
+                                                  .length,
+                                              itemBuilder: (context, index) {
+                                                final item = context
+                                                    .read<TodoNotifier>()
+                                                    .todoList[index];
 
-                                                  return AnimatedOpacity(
-                                                    opacity:
-                                                        !item['todoIsCompleted']
-                                                            ? 1
-                                                            : 0,
-                                                    onEnd: () {},
-                                                    duration: const Duration(
-                                                        milliseconds: 1000),
-                                                    curve: Curves.easeInOut,
-                                                    child: InkWell(
-                                                      onTap: () async {
-                                                        context
-                                                            .read<
-                                                                TodoNotifier>()
-                                                            .toggleTodoItemCheckState(
-                                                                index);
-                                                        Future.delayed(
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    1000), () {
-                                                          context
-                                                              .read<
-                                                                  TodoNotifier>()
-                                                              .removeDoneFromTodo(
-                                                                  index);
-                                                        });
-                                                      },
-                                                      child: SizedBox(
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
+                                                return AnimatedOpacity(
+                                                  opacity:
+                                                      !item['todoIsCompleted']
+                                                          ? 1
+                                                          : 0,
+                                                  onEnd: () {},
+                                                  duration: const Duration(
+                                                      milliseconds: 1000),
+                                                  curve: Curves.easeInOut,
+                                                  child: SizedBox(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
                                                           children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                SizedBox(
-                                                                  height: 30.h,
-                                                                  child: Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      Image
-                                                                          .asset(
-                                                                        item['todoIsCompleted']
-                                                                            ? 'assets/png/checked.png'
-                                                                            : 'assets/png/unchecked.png',
-                                                                        width:
-                                                                            25,
-                                                                      ),
-                                                                      10.horizontalSpace,
-                                                                      SizedBox(
-                                                                        width:
-                                                                            180.w,
-                                                                        child:
-                                                                            CustomText(
-                                                                          requiredText:
-                                                                              item['todoName'] ?? '',
-                                                                          overflow:
-                                                                              TextOverflow.ellipsis,
-                                                                          softWrap:
-                                                                              true,
-                                                                          textDecoration: item['todoIsCompleted']
-                                                                              ? TextDecoration.lineThrough
-                                                                              : TextDecoration.none,
-                                                                        ),
-                                                                      ),
-                                                                    ],
+                                                            SizedBox(
+                                                              height: 30.h,
+                                                              child: Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  InkWell(
+                                                                    onTap:
+                                                                        () async {
+                                                                      read.toggleTodoItemCheckState(
+                                                                          index);
+                                                                      Future.delayed(
+                                                                          const Duration(
+                                                                              milliseconds: 1000),
+                                                                          () {
+                                                                        context
+                                                                            .read<TodoNotifier>()
+                                                                            .removeDoneFromTodo(index);
+                                                                      });
+                                                                    },
+                                                                    child: Image
+                                                                        .asset(
+                                                                      item['todoIsCompleted']
+                                                                          ? 'assets/png/checked.png'
+                                                                          : 'assets/png/unchecked.png',
+                                                                      width: 25,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                                SizedBox(
-                                                                  height: 30,
-                                                                  child: Row(
-                                                                    children: [
-                                                                      Text(item[
-                                                                              'todoTime'] ??
-                                                                          ''),
-                                                                      10.horizontalSpace,
-                                                                      const Icon(
-                                                                        CupertinoIcons
-                                                                            .right_chevron,
-                                                                        size:
-                                                                            15,
-                                                                      )
-                                                                    ],
+                                                                  10.horizontalSpace,
+                                                                  SizedBox(
+                                                                    width:
+                                                                        180.w,
+                                                                    child:
+                                                                        CustomText(
+                                                                      requiredText:
+                                                                          item['todoName'] ??
+                                                                              '',
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      softWrap:
+                                                                          true,
+                                                                      textDecoration: item[
+                                                                              'todoIsCompleted']
+                                                                          ? TextDecoration
+                                                                              .lineThrough
+                                                                          : TextDecoration
+                                                                              .none,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              ],
+                                                                ],
+                                                              ),
                                                             ),
-                                                            const Divider(
-                                                              color: Color(
-                                                                  0xFFEBEAEA),
-                                                              thickness: 1.5,
-                                                            )
+                                                            SizedBox(
+                                                              height: 30,
+                                                              child: Row(
+                                                                children: [
+                                                                  Text(item[
+                                                                          'todoTime'] ??
+                                                                      ''),
+                                                                  10.horizontalSpace,
+                                                                  const Icon(
+                                                                    CupertinoIcons
+                                                                        .right_chevron,
+                                                                    size: 15,
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
                                                           ],
                                                         ),
-                                                      ),
+                                                        const Divider(
+                                                          color:
+                                                              Color(0xFFEBEAEA),
+                                                          thickness: 1.5,
+                                                        )
+                                                      ],
                                                     ),
-                                                  );
-                                                },
-                                              )
-                                            : const Center(
-                                                child: Text('No todos yet'),
-                                              )
-                                        : const SizedBox(),
-                                  ),
+                                                  ),
+                                                );
+                                              },
+                                            )
+                                          : const Center(
+                                              child: Text('No todos yet'),
+                                            )
+                                      : const SizedBox(),
                                 ),
                               ),
 
@@ -544,8 +553,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   .read<TodoNotifier>()
                                   .toggleOverdueVisibility(),
                               child: Container(
-                                width: 343,
-                                height: 39,
+                                width: double.infinity,
+                                height: 41.h,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 15, vertical: 10),
                                 decoration: ShapeDecoration(
@@ -590,7 +599,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     BorderRadius.circular(5)),
                                           ),
                                           child: Text(
-                                            "${context.watch<TodoNotifier>().overdueTodoList.length}",
+                                            "${watch.overdueTodoList.length}",
                                             style: GoogleFonts.roboto(
                                               color: Colors.white,
                                               fontSize: MyDimension.dim10,
@@ -619,144 +628,137 @@ class _HomeScreenState extends State<HomeScreen> {
                               AnimatedOpacity(
                                 opacity: todoNotifier.isOverdue ? 1.0 : 0.0,
                                 duration: const Duration(milliseconds: 800),
-                                child: SizedBox(
-                                  height: mediaQuery.height * 0.3,
-                                  width: mediaQuery.width,
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 300),
-                                    color: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20),
-                                    height:
-                                        context.watch<TodoNotifier>().isOverdue
-                                            ? MediaQuery.of(context).size.height
-                                            : 0,
-                                    child: context
-                                            .watch<TodoNotifier>()
-                                            .isOverdue
-                                        ? context
-                                                .watch<TodoNotifier>()
-                                                .overdueTodoList
-                                                .isNotEmpty
-                                            ? ListView.builder(
-                                                itemCount: context
-                                                    .watch<TodoNotifier>()
-                                                    .overdueTodoList
-                                                    .length,
-                                                itemBuilder: (context, index) {
-                                                  final item = context
-                                                      .read<TodoNotifier>()
-                                                      .overdueTodoList[index];
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  color: Colors.white,
+                                  padding: EdgeInsets.only(
+                                    left: 20.w,
+                                    right: 20.w,
+                                    bottom: 20.h,
+                                  ),
+                                  child: watch.isOverdue
+                                      ? context
+                                              .watch<TodoNotifier>()
+                                              .overdueTodoList
+                                              .isNotEmpty
+                                          ? ListView.builder(
+                                              shrinkWrap: true,
+                                              itemCount: context
+                                                  .watch<TodoNotifier>()
+                                                  .overdueTodoList
+                                                  .length,
+                                              itemBuilder: (context, index) {
+                                                final item = context
+                                                    .read<TodoNotifier>()
+                                                    .overdueTodoList[index];
 
-                                                  return AnimatedOpacity(
-                                                    opacity:
-                                                        !item['todoIsCompleted']
-                                                            ? 1
-                                                            : 0,
-                                                    onEnd: () {},
-                                                    duration: const Duration(
-                                                        milliseconds: 1000),
-                                                    curve: Curves.easeInOut,
-                                                    child: InkWell(
-                                                      onTap: () async {
-                                                        context
-                                                            .read<
-                                                                TodoNotifier>()
-                                                            .toggleOverdueTodoItemCheckState(
-                                                                index);
-                                                        Future.delayed(
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    1000), () {
-                                                          context
-                                                              .read<
-                                                                  TodoNotifier>()
-                                                              .removeDoneFromOverdueTodo(
-                                                                  index);
-                                                        });
-                                                      },
-                                                      child: SizedBox(
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
+                                                return AnimatedOpacity(
+                                                  opacity:
+                                                      !item['todoIsCompleted']
+                                                          ? 1
+                                                          : 0,
+                                                  onEnd: () {},
+                                                  duration: const Duration(
+                                                      milliseconds: 1000),
+                                                  curve: Curves.easeInOut,
+                                                  child: SizedBox(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
                                                           children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                SizedBox(
-                                                                  height: 30.h,
-                                                                  child: Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      Image
-                                                                          .asset(
-                                                                        item['todoIsCompleted']
-                                                                            ? 'assets/png/checked.png'
-                                                                            : 'assets/png/unchecked.png',
-                                                                        width:
-                                                                            25,
-                                                                      ),
-                                                                      10.horizontalSpace,
-                                                                      SizedBox(
-                                                                        width:
-                                                                            180.w,
-                                                                        child:
-                                                                            CustomText(
-                                                                          requiredText:
-                                                                              item['todoName'] ?? '',
-                                                                          overflow:
-                                                                              TextOverflow.ellipsis,
-                                                                          softWrap:
-                                                                              true,
-                                                                          textDecoration: item['todoIsCompleted']
-                                                                              ? TextDecoration.lineThrough
-                                                                              : TextDecoration.none,
-                                                                        ),
-                                                                      ),
-                                                                    ],
+                                                            SizedBox(
+                                                              height: 30.h,
+                                                              child: Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  InkWell(
+                                                                    onTap:
+                                                                        () async {
+                                                                      read.toggleOverdueTodoItemCheckState(
+                                                                          index);
+                                                                      Future.delayed(
+                                                                          const Duration(
+                                                                              milliseconds: 1000),
+                                                                          () {
+                                                                        context
+                                                                            .read<TodoNotifier>()
+                                                                            .removeDoneFromOverdueTodo(index);
+                                                                      });
+                                                                    },
+                                                                    child: Image
+                                                                        .asset(
+                                                                      item['todoIsCompleted']
+                                                                          ? 'assets/png/checked.png'
+                                                                          : 'assets/png/unchecked.png',
+                                                                      width: 25,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                                SizedBox(
-                                                                  height: 30,
-                                                                  child: Row(
-                                                                    children: [
-                                                                      Text(item[
-                                                                              'todoTime'] ??
-                                                                          ''),
-                                                                      10.horizontalSpace,
-                                                                      const Icon(
-                                                                        CupertinoIcons
-                                                                            .right_chevron,
-                                                                        size:
-                                                                            15,
-                                                                      )
-                                                                    ],
+                                                                  10.horizontalSpace,
+                                                                  SizedBox(
+                                                                    width:
+                                                                        180.w,
+                                                                    child:
+                                                                        CustomText(
+                                                                      requiredText:
+                                                                          item['todoName'] ??
+                                                                              '',
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      softWrap:
+                                                                          true,
+                                                                      textDecoration: item[
+                                                                              'todoIsCompleted']
+                                                                          ? TextDecoration
+                                                                              .lineThrough
+                                                                          : TextDecoration
+                                                                              .none,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              ],
+                                                                ],
+                                                              ),
                                                             ),
-                                                            const Divider(
-                                                              color: Color(
-                                                                  0xFFEBEAEA),
-                                                              thickness: 1.5,
-                                                            )
+                                                            SizedBox(
+                                                              height: 30,
+                                                              child: Row(
+                                                                children: [
+                                                                  Text(item[
+                                                                          'todoTime'] ??
+                                                                      ''),
+                                                                  10.horizontalSpace,
+                                                                  const Icon(
+                                                                    CupertinoIcons
+                                                                        .right_chevron,
+                                                                    size: 15,
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
                                                           ],
                                                         ),
-                                                      ),
+                                                        const Divider(
+                                                          color:
+                                                              Color(0xFFEBEAEA),
+                                                          thickness: 1.5,
+                                                        )
+                                                      ],
                                                     ),
-                                                  );
-                                                },
-                                              )
-                                            : const Center(
-                                                child: Text('No todos yet'),
-                                              )
-                                        : const SizedBox(),
-                                  ),
+                                                  ),
+                                                );
+                                              },
+                                            )
+                                          : const Center(
+                                              child: Text('No todos yet'),
+                                            )
+                                      : const SizedBox(),
                                 ),
                               ),
 
@@ -767,8 +769,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   .read<TodoNotifier>()
                                   .toggleNotesVisibility(),
                               child: Container(
-                                width: 343,
-                                height: 39,
+                                width: double.infinity,
+                                height: 41.h,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 15, vertical: 10),
                                 decoration: ShapeDecoration(
@@ -813,8 +815,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (todoNotifier.isFloatingPressed)
                       AnimatedPositioned(
                         curve: Curves.easeInOut,
-                        bottom: 130,
-                        right: 30,
+                        bottom: 195,
+                        right: 40,
                         duration: const Duration(milliseconds: 2000),
                         child: GestureDetector(
                           onTap: () {
@@ -862,8 +864,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       AnimatedPositioned(
                         duration: const Duration(milliseconds: 2000),
                         curve: Curves.easeInOut,
-                        bottom: 80,
-                        right: 30,
+                        bottom: 140,
+                        right: 40,
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 2000),
                           curve: Curves.easeInOut,
@@ -935,7 +937,7 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Settings',
           ),
         ],
-        currentIndex: context.watch<TodoNotifier>().navIndex,
+        currentIndex: watch.navIndex,
         onTap: (index) async {
           context.read<TodoNotifier>().setNavIndex(index);
           _controller.jumpToPage(index);

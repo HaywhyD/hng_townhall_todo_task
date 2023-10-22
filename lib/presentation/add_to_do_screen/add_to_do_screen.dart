@@ -49,6 +49,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context).size;
     final todoNotifier = context.watch<TodoNotifier>();
+    final read = context.read<TodoNotifier>();
 
     return Scaffold(
         backgroundColor: Colors.white,
@@ -310,7 +311,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                         onTap: () {
                           if (todoNotifier.isOneTempSubTask &&
                               !todoNotifier.showTaskField) {
-                            context.read<TodoNotifier>().setShowTaskField(true);
+                            read.setShowTaskField(true);
                           }
                         },
                         child: CustomText(
@@ -349,12 +350,9 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                                                 .length,
                                             (index) => false);
                                         isChecked[index] = !isChecked[index];
-                                        context
-                                            .read<TodoNotifier>()
-                                            .setSelectedCategoryIndex(index);
-                                        category = context
-                                            .read<TodoNotifier>()
-                                            .categories[index]['text'];
+                                        read.setSelectedCategoryIndex(index);
+                                        category =
+                                            read.categories[index]['text'];
                                       });
                                     },
                                     child: Container(
@@ -390,9 +388,9 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                                           ),
                                           Expanded(
                                             child: CustomText(
-                                              requiredText: context
-                                                  .read<TodoNotifier>()
-                                                  .categories[index]['text'],
+                                              requiredText: read
+                                                  .categories[index]['text']
+                                                  .replaceAll('\n', ' '),
                                               fontSize: MyDimension.dim12,
                                               color: Colors.white,
                                               fontWeight: FontWeight.w500,
